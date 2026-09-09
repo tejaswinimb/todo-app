@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TaskFlow</title>
+<style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f4f6f8; display: flex; justify-content: center; padding: 40px 20px; }
+    .container { background: white; max-width: 500px; width: 100%; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    h1 { margin: 0 0 5px; color: #222; }
+    .subtitle { color: #888; margin-bottom: 20px; font-size: 14px; }
+    .progress-bar { background: #eee; border-radius: 10px; height: 10px; overflow: hidden; margin-bottom: 20px; }
+    .progress-fill { background: #4caf50; height: 100%; transition: width 0.3s; }
+    form { display: flex; gap: 8px; margin-bottom: 20px; }
+    input[type=text] { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+    select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+    button { padding: 10px 16px; background: #4361ee; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #3a53d0; }
+    ul { list-style: none; padding: 0; margin: 0; }
+    li { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #f0f0f0; }
+    .badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; color: white; margin-right: 8px; }
+    .High { background: #e63946; }
+    .Medium { background: #f4a261; }
+    .Low { background: #2a9d8f; }
+    .done { text-decoration: line-through; color: #aaa; }
+    .actions a { font-size: 12px; margin-left: 10px; color: #888; text-decoration: none; }
+    .actions a:hover { color: #4361ee; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>TaskFlow</h1>
+    <p class="subtitle">{{ completed }} of {{ total }} tasks completed</p>
+    <div class="progress-bar"><div class="progress-fill" style="width: {{ percent }}%;"></div></div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="What needs to be done?" required>
+        <select name="priority">
+            <option value="High">High</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Low">Low</option>
+        </select>
+        <button type="submit">Add</button>
+    </form>
+
+    <ul>
+        {% for task in tasks %}
+        <li>
+            <div>
+                <span class="badge {{ task.priority }}">{{ task.priority }}</span>
+                <span class="{% if task.completed %}done{% endif %}">{{ task.title }}</span>
+            </div>
+            <div class="actions">
+                <a href="{% url 'toggle_task' task.id %}">toggle</a>
+                <a href="{% url 'delete_task' task.id %}">delete</a>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+</body>
+</html>
